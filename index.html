@@ -159,11 +159,12 @@
 <div class="container">
 
   <!-- ══════════════════════════════════════════════════════
-       ⚠️  ADRESSE 0xB3Dd317c35f4fC4069c639D37d3C4a3db6C39A6a
-       
+       ⚠️  COLLE TON ADRESSE DU CONTRAT ICI ↓
+       Après avoir déployé main.py dans GenLayer Studio,
+       copie l'adresse et remplace la valeur ci-dessous.
        ══════════════════════════════════════════════════════ -->
   <div class="cbar">
-    <span>📄 Contract:</span>
+    <span> 0xB3Dd317c35f4fC4069c639D37d3C4a3db6C39A6a:</span>
     <a id="clink" href="#" target="_blank">loading...</a>
     <span>·</span>
     <a href="https://explorer-studio.genlayer.com/" target="_blank">Explorer ↗</a>
@@ -299,9 +300,9 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
 <script>
 // ══════════════════════════════════════════════════════════════
-//  ADRESSE DE CONTRAT ICI 
-//  
-//  
+//  ⚠️  ÉTAPE 1 — COLLE TON ADRESSE DE CONTRAT ICI ↓
+//  Déploie main.py dans GenLayer Studio → copie l'adresse
+//  Exemple: "0xB3Dd317c35f4fC4069c639D37d3C4a3db6C39A6a"
 // ══════════════════════════════════════════════════════════════
 const CONTRACT_ADDR = "0xB3Dd317c35f4fC4069c639D37d3C4a3db6C39A6a";
 //  ══════════════════════════════════════════════════════════════
@@ -324,7 +325,7 @@ const ABI = [
 
 // Met à jour le lien contrat dans la page
 document.getElementById('clink').textContent =
-  CONTRACT_ADDR.startsWith("0xB3Dd317c35f4fC4069c639D37d3C4a3db6C39A6a")
+  CONTRACT_ADDR.startsWith("0xREMPLACE")
     ? "⚠ Adresse non configurée"
     : CONTRACT_ADDR.slice(0,8)+'...'+CONTRACT_ADDR.slice(-6);
 document.getElementById('clink').href =
@@ -453,7 +454,7 @@ async function checkPending(){
 // ── writeContract ────────────────────────────────────────────
 async function callWrite(fn, args, label){
   if(!wc){setSt('Connect wallet first','rd');return null;}
-  if(CONTRACT_ADDR.startsWith(0xB3Dd317c35f4fC4069c639D37d3C4a3db6C39A6a")){
+  if(CONTRACT_ADDR.startsWith("0xB3Dd317c35f4fC4069c639D37d3C4a3db6C39A6a")){
     setSt('⚠ Set your contract address in index.html line 1!','rd');
     log('ERROR: CONTRACT_ADDR not set');
     return null;
