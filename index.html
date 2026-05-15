@@ -6,248 +6,271 @@
   <title>CardBattle — GenLayer On-Chain Duels</title>
   <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Cinzel:wght@400;600&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --gold:#c9a84c; --gold2:#f0d080; --red:#c0392b;
-      --deep:#0a0608; --card-bg:#12080e; --panel:#160c12;
-      --border:#2a1a22; --border2:#3d2530;
-      --text:#d4b896; --muted:#6b4d5a;
-      --green:#27ae60; --purple:#8b5cf6;
+    :root{
+      --gold:#c9a84c;--gold2:#f0d080;--red:#c0392b;
+      --deep:#0a0608;--panel:#160c12;--card-bg:#12080e;
+      --border:#2a1a22;--border2:#3d2530;
+      --text:#d4b896;--muted:#6b4d5a;
+      --green:#27ae60;
     }
     *{margin:0;padding:0;box-sizing:border-box}
     body{background:var(--deep);color:var(--text);font-family:'Crimson Text',serif;min-height:100vh;
-         background-image:radial-gradient(ellipse at 20% 0%,rgba(139,30,30,.12) 0%,transparent 60%),
-           radial-gradient(ellipse at 80% 100%,rgba(70,20,80,.15) 0%,transparent 60%)}
-    .header{text-align:center;padding:24px 16px 14px;border-bottom:1px solid var(--border)}
+      background-image:radial-gradient(ellipse at 20% 0%,rgba(139,30,30,.12) 0%,transparent 60%),
+        radial-gradient(ellipse at 80% 100%,rgba(70,20,80,.15) 0%,transparent 60%)}
+
+    /* header */
+    .hdr{text-align:center;padding:22px 16px 12px;border-bottom:1px solid var(--border)}
     h1{font-family:'Cinzel Decorative',serif;font-size:26px;color:var(--gold);
-       text-shadow:0 0 30px rgba(201,168,76,.4);letter-spacing:3px;margin-bottom:3px}
-    .tagline{font-size:12px;color:var(--muted);font-style:italic}
-    .feat-strip{display:flex;gap:6px;padding:8px 16px;overflow-x:auto;
-                border-bottom:1px solid var(--border);scrollbar-width:none}
-    .feat-strip::-webkit-scrollbar{display:none}
+       text-shadow:0 0 28px rgba(201,168,76,.4);letter-spacing:3px;margin-bottom:3px}
+    .tag{font-size:12px;color:var(--muted);font-style:italic}
+
+    /* chips */
+    .chips{display:flex;gap:6px;padding:8px 14px;overflow-x:auto;
+           border-bottom:1px solid var(--border);scrollbar-width:none}
+    .chips::-webkit-scrollbar{display:none}
     .chip{flex-shrink:0;background:rgba(201,168,76,.08);border:1px solid rgba(201,168,76,.2);
           border-radius:20px;padding:3px 10px;font-size:10px;color:var(--gold);
           white-space:nowrap;font-family:'Cinzel',serif}
-    .container{max-width:860px;margin:0 auto;padding:14px;display:flex;flex-direction:column;gap:12px}
+
+    /* layout */
+    .wrap{max-width:860px;margin:0 auto;padding:12px;display:flex;flex-direction:column;gap:11px}
+
+    /* contract bar */
     .cbar{background:var(--panel);border:1px solid var(--border);border-radius:8px;
           padding:7px 12px;font-size:11px;color:var(--muted);display:flex;gap:8px;flex-wrap:wrap;align-items:center}
-    .cbar a{color:var(--gold);text-decoration:none}
-    .cbar a:hover{color:var(--gold2)}
-    /* ── wallet ── */
-    .wpanel{background:var(--panel);border:1px solid var(--border);border-radius:10px;
-            padding:10px 14px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
-    .waddr{font-family:'Cinzel',serif;font-size:12px;color:var(--gold);flex:1}
-    .nbadge{font-size:10px;min-height:14px}
-    /* ── stats ── */
+    .cbar a{color:var(--gold);text-decoration:none}.cbar a:hover{color:var(--gold2)}
+
+    /* wallet */
+    .wpan{background:var(--panel);border:1px solid var(--border);border-radius:10px;
+          padding:10px 14px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+    #waddr{font-family:'Cinzel',serif;font-size:12px;color:var(--gold);flex:1;min-width:120px}
+    #nbadge{font-size:10px;flex:1}
+
+    /* stats */
     .srow{display:flex;gap:8px;flex-wrap:wrap}
-    .sbox{flex:1;min-width:70px;background:var(--panel);border:1px solid var(--border);
-          border-radius:10px;padding:8px 10px;text-align:center}
-    .slabel{font-size:10px;color:var(--muted);font-family:'Cinzel',serif;
-            text-transform:uppercase;letter-spacing:1px}
-    .sval{font-size:20px;font-weight:600;margin-top:2px}
-    .sg{color:var(--green)}.sr{color:var(--red)}.so{color:var(--gold)}.sb{color:#60a5fa}
-    /* ── arena ── */
-    .arena{display:grid;grid-template-columns:1fr auto 1fr;gap:10px;align-items:start}
-    @media(max-width:580px){.arena{grid-template-columns:1fr}.vsdiv{display:none}}
-    .aside{display:flex;flex-direction:column;gap:8px}
-    .atitle{font-family:'Cinzel',serif;font-size:10px;text-transform:uppercase;
-            letter-spacing:2px;color:var(--muted);text-align:center;margin-bottom:2px}
-    .card{background:var(--card-bg);border:1px solid var(--border2);border-radius:12px;
-          padding:12px;position:relative;min-height:190px;transition:border-color .3s,box-shadow .3s}
-    .card.gg{border-color:var(--gold);box-shadow:0 0 18px rgba(201,168,76,.2)}
-    .card.gr{border-color:var(--red);box-shadow:0 0 18px rgba(192,57,43,.25)}
-    .card.gn{border-color:var(--green);box-shadow:0 0 18px rgba(39,174,96,.2)}
-    .cart{font-size:48px;text-align:center;margin-bottom:6px;
-          filter:drop-shadow(0 0 8px rgba(201,168,76,.3))}
-    .cname{font-family:'Cinzel',serif;font-size:13px;color:var(--gold);
-           text-align:center;margin-bottom:6px}
-    .pbar{display:flex;align-items:center;gap:6px;margin-bottom:8px}
-    .plabel{font-size:10px;color:var(--muted);font-family:'Cinzel',serif;white-space:nowrap}
-    .ptrack{flex:1;height:4px;background:var(--border);border-radius:2px;overflow:hidden}
-    .pfill{height:100%;background:linear-gradient(90deg,var(--red),var(--gold));
-           border-radius:2px;transition:width .4s ease}
-    .pnum{font-family:'Cinzel',serif;font-size:11px;color:var(--gold2);min-width:18px;text-align:right}
-    .cinput{width:100%;background:rgba(0,0,0,.4);border:1px solid var(--border2);
-            border-radius:6px;padding:6px 9px;color:var(--text);font-family:'Crimson Text',serif;
-            font-size:13px;margin-bottom:5px;transition:border-color .2s}
-    .cinput:focus{outline:none;border-color:var(--gold)}
-    .cinput::placeholder{color:var(--muted)}
-    .pslider{width:100%;margin-bottom:8px;accent-color:var(--gold)}
-    /* ── vs ── */
-    .vsdiv{display:flex;flex-direction:column;align-items:center;justify-content:center;
-           padding-top:36px;gap:5px}
-    .vstext{font-family:'Cinzel Decorative',serif;font-size:20px;color:var(--gold);
-            text-shadow:0 0 18px rgba(201,168,76,.5)}
-    .vsline{width:1px;height:36px;background:linear-gradient(to bottom,transparent,var(--border2),transparent)}
-    /* ── pending ── */
+    .sb{flex:1;min-width:70px;background:var(--panel);border:1px solid var(--border);
+        border-radius:10px;padding:8px 10px;text-align:center}
+    .sl{font-size:10px;color:var(--muted);font-family:'Cinzel',serif;
+        text-transform:uppercase;letter-spacing:1px}
+    .sv{font-size:20px;font-weight:600;margin-top:2px}
+    .cg{color:var(--green)}.cr{color:var(--red)}.co{color:var(--gold)}.cb{color:#60a5fa}
+
+    /* status */
+    .stbar{background:var(--panel);border:1px solid var(--border);border-radius:8px;
+           padding:7px 12px;font-size:12px;min-height:34px;display:flex;align-items:center;gap:7px}
+    .dot{width:6px;height:6px;border-radius:50%;background:var(--muted);flex-shrink:0}
+    .dot.go{background:var(--gold)}.dot.gn{background:var(--green)}.dot.rd{background:var(--red)}
+    .dot.pulse{animation:pulse 1.4s infinite}
+    @keyframes pulse{0%,100%{opacity:1}50%{opacity:.25}}
+
+    /* pending */
     .pbox{background:rgba(201,168,76,.06);border:1px solid rgba(201,168,76,.25);
           border-radius:10px;padding:10px 12px;font-size:12px;display:none}
     .pbox.show{display:block}
-    .ptitle{font-family:'Cinzel',serif;font-size:10px;color:var(--gold);
-            text-transform:uppercase;letter-spacing:1px;margin-bottom:5px}
-    /* ── narrative ── */
+    .ptit{font-family:'Cinzel',serif;font-size:10px;color:var(--gold);
+          text-transform:uppercase;letter-spacing:1px;margin-bottom:5px}
+
+    /* arena */
+    .arena{display:grid;grid-template-columns:1fr auto 1fr;gap:10px;align-items:start}
+    @media(max-width:560px){.arena{grid-template-columns:1fr}.vsdiv{display:none}}
+    .aside{display:flex;flex-direction:column;gap:7px}
+    .atit{font-family:'Cinzel',serif;font-size:10px;text-transform:uppercase;
+          letter-spacing:2px;color:var(--muted);text-align:center;margin-bottom:2px}
+
+    /* card */
+    .card{background:var(--card-bg);border:1px solid var(--border2);border-radius:12px;
+          padding:12px;min-height:188px;transition:border-color .3s,box-shadow .3s}
+    .card.gg{border-color:var(--gold);box-shadow:0 0 16px rgba(201,168,76,.2)}
+    .card.gr{border-color:var(--red);box-shadow:0 0 16px rgba(192,57,43,.2)}
+    .cart{font-size:46px;text-align:center;margin-bottom:6px;
+          filter:drop-shadow(0 0 8px rgba(201,168,76,.3))}
+    .cname{font-family:'Cinzel',serif;font-size:13px;color:var(--gold);
+           text-align:center;margin-bottom:6px}
+    .pbar{display:flex;align-items:center;gap:6px;margin-bottom:7px}
+    .plbl{font-size:10px;color:var(--muted);font-family:'Cinzel',serif;white-space:nowrap}
+    .ptr{flex:1;height:4px;background:var(--border);border-radius:2px;overflow:hidden}
+    .pfl{height:100%;background:linear-gradient(90deg,var(--red),var(--gold));
+         border-radius:2px;transition:width .4s}
+    .pnum{font-family:'Cinzel',serif;font-size:11px;color:var(--gold2);
+          min-width:18px;text-align:right}
+    .ci{width:100%;background:rgba(0,0,0,.4);border:1px solid var(--border2);
+        border-radius:6px;padding:6px 9px;color:var(--text);
+        font-family:'Crimson Text',serif;font-size:13px;margin-bottom:5px}
+    .ci:focus{outline:none;border-color:var(--gold)}
+    .ci::placeholder{color:var(--muted)}
+    .psl{width:100%;margin-bottom:8px;accent-color:var(--gold)}
+
+    /* vs */
+    .vsdiv{display:flex;flex-direction:column;align-items:center;
+           justify-content:center;padding-top:34px;gap:4px}
+    .vstext{font-family:'Cinzel Decorative',serif;font-size:20px;color:var(--gold);
+            text-shadow:0 0 18px rgba(201,168,76,.5)}
+    .vsline{width:1px;height:34px;background:linear-gradient(to bottom,transparent,var(--border2),transparent)}
+
+    /* narrative */
     .narr{background:var(--panel);border:1px solid var(--border2);
           border-left:3px solid var(--gold);border-radius:10px;
           padding:12px 14px;display:none}
     .narr.show{display:block}
-    .narrtitle{font-family:'Cinzel',serif;font-size:10px;text-transform:uppercase;
-               letter-spacing:2px;color:var(--gold);margin-bottom:7px}
-    .narrtext{font-style:italic;font-size:14px;line-height:1.6;color:var(--text)}
-    .badge{display:inline-block;margin-top:7px;padding:2px 11px;
-           border-radius:20px;font-family:'Cinzel',serif;font-size:10px}
-    .bwin{background:rgba(39,174,96,.15);color:var(--green);border:1px solid var(--green)}
-    .bloss{background:rgba(192,57,43,.15);color:var(--red);border:1px solid var(--red)}
-    /* ── dispute ── */
-    .dpanel{background:var(--panel);border:1px solid rgba(192,57,43,.3);
-            border-radius:10px;padding:12px;display:none}
-    .dpanel.show{display:block}
-    .dtitle{font-family:'Cinzel',serif;font-size:10px;color:var(--red);
-            text-transform:uppercase;letter-spacing:1px;margin-bottom:7px}
-    .vdisp{margin-top:7px;font-size:12px;font-style:italic}
-    /* ── buttons ── */
-    .btn{padding:8px 16px;border-radius:8px;border:1px solid var(--border2);
+    .ntit{font-family:'Cinzel',serif;font-size:10px;text-transform:uppercase;
+          letter-spacing:2px;color:var(--gold);margin-bottom:7px}
+    .ntxt{font-style:italic;font-size:14px;line-height:1.6}
+    .badge{display:inline-block;margin-top:6px;padding:2px 11px;border-radius:20px;
+           font-family:'Cinzel',serif;font-size:10px}
+    .bw{background:rgba(39,174,96,.15);color:var(--green);border:1px solid var(--green)}
+    .bl{background:rgba(192,57,43,.15);color:var(--red);border:1px solid var(--red)}
+
+    /* dispute */
+    .dpan{background:var(--panel);border:1px solid rgba(192,57,43,.3);
+          border-radius:10px;padding:12px;display:none}
+    .dpan.show{display:block}
+    .dtit{font-family:'Cinzel',serif;font-size:10px;color:var(--red);
+          text-transform:uppercase;letter-spacing:1px;margin-bottom:7px}
+
+    /* leaderboard */
+    .lbc{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:10px 12px}
+    .lbt{font-family:'Cinzel',serif;font-size:10px;color:var(--gold);text-transform:uppercase;
+         letter-spacing:2px;margin-bottom:8px;display:flex;align-items:center;gap:7px}
+    .lbt::after{content:'';flex:1;height:1px;
+                background:linear-gradient(90deg,var(--border2),transparent)}
+    .lbr{display:flex;justify-content:space-between;align-items:center;
+         padding:4px 7px;border-radius:6px;margin-bottom:2px;font-size:12px}
+    .lbr:first-child{background:rgba(201,168,76,.08)}
+    .lbrk{color:var(--gold);font-family:'Cinzel',serif;font-size:10px;width:20px}
+    .lba{color:var(--muted);flex:1;margin:0 7px;overflow:hidden;
+         text-overflow:ellipsis;white-space:nowrap}
+    .lbp{color:var(--gold2);font-family:'Cinzel',serif;font-size:10px}
+
+    /* buttons */
+    .btn{padding:8px 14px;border-radius:8px;border:1px solid var(--border2);
          background:var(--panel);color:var(--text);cursor:pointer;
          font-family:'Cinzel',serif;font-size:10px;letter-spacing:1px;
          text-transform:uppercase;transition:all .2s;width:100%}
-    .btn:hover{border-color:var(--gold);color:var(--gold)}
-    .bgold{background:linear-gradient(135deg,#7a5c1e,#c9a84c);border-color:var(--gold);
-           color:#0a0608;font-weight:700}
-    .bgold:hover{background:linear-gradient(135deg,#9a7228,#f0d080)}
+    .btn:hover:not(:disabled){border-color:var(--gold);color:var(--gold)}
+    .btn:disabled{opacity:.4;cursor:not-allowed}
+    .bgold{background:linear-gradient(135deg,#7a5c1e,#c9a84c);
+           border-color:var(--gold);color:#0a0608;font-weight:700}
+    .bgold:hover:not(:disabled){background:linear-gradient(135deg,#9a7228,#f0d080)}
     .bred{background:rgba(192,57,43,.15);border-color:var(--red);color:var(--red)}
-    .bred:hover{background:rgba(192,57,43,.25)}
-    .bsm{padding:5px 11px;font-size:10px;width:auto}
-    /* ── status ── */
-    .sbar{background:var(--panel);border:1px solid var(--border);border-radius:8px;
-          padding:7px 12px;font-size:12px;min-height:34px;display:flex;align-items:center;gap:7px}
-    .sdot{width:6px;height:6px;border-radius:50%;background:var(--muted);flex-shrink:0}
-    .sdot.go{background:var(--gold)}.sdot.gn{background:var(--green)}.sdot.rd{background:var(--red)}
-    .sdot.pulse{animation:pulse 1.4s infinite}
-    @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
-    /* ── lb ── */
-    .lbc{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:10px 12px}
-    .lbt{font-family:'Cinzel',serif;font-size:10px;color:var(--gold);text-transform:uppercase;
-         letter-spacing:2px;margin-bottom:9px;display:flex;align-items:center;gap:7px}
-    .lbt::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,var(--border2),transparent)}
-    .lbrow{display:flex;justify-content:space-between;align-items:center;
-           padding:4px 7px;border-radius:6px;margin-bottom:2px;font-size:12px}
-    .lbrow:first-child{background:rgba(201,168,76,.08)}
-    .lbrank{color:var(--gold);font-family:'Cinzel',serif;font-size:10px;width:20px}
-    .lbaddr{color:var(--muted);flex:1;margin:0 7px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-    .lbpts{color:var(--gold2);font-family:'Cinzel',serif;font-size:10px}
-    /* ── txlog ── */
-    .txlog{background:#05030a;border:1px solid var(--border);border-radius:7px;
-           padding:7px 9px;font-size:10px;color:#4a3a4a;max-height:65px;overflow-y:auto;
-           font-family:'Courier New',monospace;white-space:pre-wrap}
-    .stitle{font-family:'Cinzel',serif;font-size:10px;text-transform:uppercase;
-            letter-spacing:2px;color:var(--muted);margin-bottom:5px}
+    .bsm{padding:5px 11px;width:auto}
+
+    /* txlog */
+    .txl{background:#05030a;border:1px solid var(--border);border-radius:7px;
+         padding:7px 9px;font-size:10px;color:#4a3a4a;max-height:65px;overflow-y:auto;
+         font-family:'Courier New',monospace;white-space:pre-wrap}
+
+    .stit{font-family:'Cinzel',serif;font-size:10px;text-transform:uppercase;
+          letter-spacing:2px;color:var(--muted);margin-bottom:4px}
   </style>
 </head>
 <body>
 
-<div class="header">
+<div class="hdr">
   <h1>⚔ CardBattle</h1>
-  <div class="tagline">On-chain duels · LLM arbitration · GenLayer Intelligent Contract</div>
+  <div class="tag">On-chain duels · LLM arbitration · GenLayer Intelligent Contract</div>
 </div>
 
-<div class="feat-strip">
+<div class="chips">
   <div class="chip">🧠 LLM Arbitration</div>
-  <div class="chip">🗳 Multi-Validator Consensus</div>
-  <div class="chip">🌐 Trustless Disputes</div>
+  <div class="chip">🗳 5-Validator Consensus</div>
+  <div class="chip">⚖ Trustless Disputes</div>
   <div class="chip">🎲 Non-Deterministic Logic</div>
   <div class="chip">🔗 GenLayer Studionet</div>
 </div>
 
-<div class="container">
+<div class="wrap">
 
-  <!-- ══════════════════════════════════════════════════════
-       ⚠️  COLLE TON ADRESSE DU CONTRAT ICI ↓
-       Après avoir déployé main.py dans GenLayer Studio,
-       copie l'adresse et remplace la valeur ci-dessous.
-       ══════════════════════════════════════════════════════ -->
   <div class="cbar">
-    <span> 0xB3Dd317c35f4fC4069c639D37d3C4a3db6C39A6a:</span>
-    <a id="clink" href="#" target="_blank">loading...</a>
+    <span>📄 Contract:</span>
+    <a id="clink" href="https://explorer-studio.genlayer.com/contracts/0xB3Dd317c35f4fC4069c639D37d3C4a3db6C39A6a"
+       target="_blank">0xB3Dd31...C39A6a</a>
     <span>·</span>
     <a href="https://explorer-studio.genlayer.com/" target="_blank">Explorer ↗</a>
+    <span>·</span>
+    <a href="https://github.com/akindexhub777/Card-Battle" target="_blank">GitHub ↗</a>
     <span>·</span>
     <span style="color:var(--gold)">Intelligent Contract + LLM</span>
   </div>
 
-  <!-- wallet -->
-  <div class="wpanel">
-    <div>
-      <div class="waddr" id="waddr">Not connected</div>
-      <div class="nbadge" id="nbadge"></div>
+  <!-- WALLET -->
+  <div class="wpan">
+    <div style="flex:1;min-width:160px">
+      <div id="waddr" style="font-family:'Cinzel',serif;font-size:12px;color:var(--gold)">
+        Not connected
+      </div>
+      <div id="nbadge" style="font-size:10px;margin-top:3px"></div>
     </div>
-    <button class="btn bgold bsm" onclick="connectWallet()">⚔ Connect Wallet</button>
-    <button class="btn bsm" onclick="syncStats()">🔄 Sync</button>
-    <button class="btn bsm" onclick="checkPending()">🔍 Check Arena</button>
+    <button class="btn bgold bsm" id="btnConnect" onclick="connectWallet()">⚔ Connect Wallet</button>
+    <button class="btn bsm" onclick="syncStats()" id="btnSync" disabled>🔄 Sync</button>
+    <button class="btn bsm" onclick="checkPending()" id="btnCheck" disabled>🔍 Arena</button>
   </div>
 
-  <!-- stats -->
+  <!-- STATS -->
   <div class="srow">
-    <div class="sbox"><div class="slabel">Wins</div><div class="sval sg" id="dw">0</div></div>
-    <div class="sbox"><div class="slabel">Losses</div><div class="sval sr" id="dl">0</div></div>
-    <div class="sbox"><div class="slabel">Points</div><div class="sval so" id="dp">0</div></div>
-    <div class="sbox"><div class="slabel">On-Chain</div><div class="sval sb" id="dc">—</div></div>
+    <div class="sb"><div class="sl">Wins</div><div class="sv cg" id="dw">0</div></div>
+    <div class="sb"><div class="sl">Losses</div><div class="sv cr" id="dl">0</div></div>
+    <div class="sb"><div class="sl">Points</div><div class="sv co" id="dp">0</div></div>
+    <div class="sb"><div class="sl">On-Chain</div><div class="sv cb" id="dc">—</div></div>
   </div>
 
-  <!-- status bar -->
-  <div class="sbar">
-    <div class="sdot" id="sdot"></div>
+  <!-- STATUS BAR -->
+  <div class="stbar">
+    <div class="dot" id="sdot"></div>
     <span id="smsg">Connect your wallet to enter the arena</span>
   </div>
 
-  <!-- pending battle -->
+  <!-- PENDING BATTLE -->
   <div class="pbox" id="pbox">
-    <div class="ptitle">⚔ Open Challenge — Someone is waiting!</div>
-    <div id="pinfo" style="font-size:12px;color:var(--text)"></div>
-    <div style="margin-top:6px;font-size:11px;color:var(--muted)">
-      Submit your card below to trigger the battle
-    </div>
+    <div class="ptit">⚔ Open Challenge — Opponent waiting!</div>
+    <div id="pinfo" style="font-size:12px;color:var(--text);margin-bottom:4px"></div>
+    <div style="font-size:11px;color:var(--muted)">Submit your card to trigger the battle ↓</div>
   </div>
 
-  <!-- arena -->
-  <div class="stitle">⚔ Battle Arena</div>
+  <!-- ARENA -->
+  <div class="stit">⚔ Battle Arena</div>
   <div class="arena">
 
+    <!-- YOUR CARD -->
     <div class="aside">
-      <div class="atitle">Your Card</div>
+      <div class="atit">Your Card</div>
       <div class="card" id="mycard">
         <div class="cart" id="myart">🃏</div>
         <div class="cname" id="myname">Choose your card</div>
         <div class="pbar">
-          <span class="plabel">PWR</span>
-          <div class="ptrack"><div class="pfill" id="myfill" style="width:50%"></div></div>
+          <span class="plbl">PWR</span>
+          <div class="ptr"><div class="pfl" id="myfill" style="width:50%"></div></div>
           <span class="pnum" id="mypnum">5</span>
         </div>
-        <input class="cinput" id="cname" placeholder="Card name (Dragon, Zeus, Witch...)"
+        <input class="ci" id="cname" placeholder="Card name (Dragon, Zeus, Witch...)"
                oninput="updateCard()" maxlength="30">
-        <input type="range" class="pslider" id="cpow" min="1" max="10" value="5"
+        <input type="range" class="psl" id="cpow" min="1" max="10" value="5"
                oninput="updatePow()">
-        <div style="display:flex;gap:6px;margin-top:6px">
-          <button class="btn bgold" onclick="doChallenge()">⚔ Challenge!</button>
-        </div>
+        <button class="btn bgold" id="btnChallenge" onclick="doChallenge()" disabled>
+          ⚔ Challenge!
+        </button>
       </div>
     </div>
 
+    <!-- VS -->
     <div class="vsdiv">
       <div class="vsline"></div>
       <div class="vstext">VS</div>
       <div class="vsline"></div>
     </div>
 
+    <!-- OPPONENT CARD -->
     <div class="aside">
-      <div class="atitle">Opponent</div>
+      <div class="atit">Opponent</div>
       <div class="card" id="oppcard">
-        <div class="cart">⚔</div>
-        <div class="cname" style="color:var(--muted)" id="oppname">Waiting for challenger...</div>
+        <div class="cart" id="oppart">⚔</div>
+        <div class="cname" id="oppname" style="color:var(--muted)">Waiting...</div>
         <div id="oppinfo" style="font-size:11px;color:var(--muted);margin-top:6px;font-style:italic">
-          No pending challenge. Submit yours to start one, or wait for an opponent.
+          No challenge open. Submit yours or wait for an opponent.
         </div>
         <div id="oppstats" style="display:none;margin-top:8px">
           <div class="pbar">
-            <span class="plabel">PWR</span>
-            <div class="ptrack"><div class="pfill" id="oppfill" style="width:50%"></div></div>
+            <span class="plbl">PWR</span>
+            <div class="ptr"><div class="pfl" id="oppfill" style="width:50%"></div></div>
             <span class="pnum" id="opppnum">?</span>
           </div>
         </div>
@@ -256,34 +279,36 @@
 
   </div>
 
-  <!-- cancel -->
-  <button class="btn bsm bred" id="cancelbtn" onclick="doCancel()"
+  <!-- CANCEL -->
+  <button class="btn bsm bred" id="btnCancel" onclick="doCancel()"
           style="display:none;width:auto;align-self:flex-start">
     ✕ Cancel My Challenge
   </button>
 
-  <!-- narrative -->
+  <!-- NARRATIVE -->
   <div class="narr" id="narrbox">
-    <div class="narrtitle">🤖 LLM Battle Verdict — GenLayer Consensus</div>
-    <div class="narrtext" id="narrtext"></div>
-    <div id="narrbadge"></div>
+    <div class="ntit">🤖 LLM Battle Verdict — GenLayer Consensus</div>
+    <div class="ntxt" id="ntxt"></div>
+    <div id="nbadge2"></div>
   </div>
 
-  <!-- dispute -->
-  <button class="btn bsm" onclick="toggleDispute()" style="width:auto;align-self:flex-start">
+  <!-- DISPUTE -->
+  <button class="btn bsm" id="btnDispute" onclick="toggleDispute()"
+          style="width:auto;align-self:flex-start" disabled>
     ⚖ Dispute Last Result
   </button>
-  <div class="dpanel" id="dpanel">
-    <div class="dtitle">⚖ Dispute — Trustless LLM Re-Arbitration</div>
+  <div class="dpan" id="dpan">
+    <div class="dtit">⚖ Dispute — LLM Re-Arbitration On-Chain</div>
     <div style="font-size:12px;color:var(--muted);margin-bottom:7px">
-      Provide context to challenge the last battle verdict. Be convincing — GenLayer LLM is the judge.
+      Provide context. If convincing, LLM may raise your score.
+      If ridiculous, expect a worse verdict.
     </div>
-    <input class="cinput" id="dreason" placeholder="Your dispute reason...">
+    <input class="ci" id="dreason" placeholder="Your dispute reason...">
     <button class="btn bred" onclick="doDispute()">⚖ File Dispute On-Chain</button>
-    <div class="vdisp" id="dverdict"></div>
+    <div id="dverdict" style="margin-top:7px;font-size:12px;font-style:italic"></div>
   </div>
 
-  <!-- leaderboard -->
+  <!-- LEADERBOARD -->
   <div class="lbc">
     <div class="lbt">🏆 Leaderboard</div>
     <div id="lb">
@@ -293,318 +318,562 @@
     </div>
   </div>
 
-  <div class="txlog" id="txlog">[ CardBattle · GenLayer TX Log ]</div>
+  <div class="txl" id="txl">[ CardBattle · GenLayer TX Log ]</div>
 
-</div>
+</div><!-- /wrap -->
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
+<!-- ethers v5 — version stable et largement compatible -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"
+        crossorigin="anonymous"></script>
 <script>
-// ══════════════════════════════════════════════════════════════
-//  ⚠️  ÉTAPE 1 — COLLE TON ADRESSE DE CONTRAT ICI ↓
-//  Déploie main.py dans GenLayer Studio → copie l'adresse
-//  Exemple: "0xB3Dd317c35f4fC4069c639D37d3C4a3db6C39A6a"
-// ══════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════
+//  CONFIG — NE PAS MODIFIER
+// ═══════════════════════════════════════════════════════════════
 const CONTRACT_ADDR = "0xB3Dd317c35f4fC4069c639D37d3C4a3db6C39A6a";
-//  ══════════════════════════════════════════════════════════════
+const CHAIN_ID      = 61999;        // GenLayer Studionet
+const GL_RPC        = "https://studio.genlayer.com/api";
 
-const CHAIN_ID = 61999;      // GenLayer Studionet
-const GL_RPC   = "https://studio.genlayer.com/api";
-
-// ABI — exactement aligné avec main.py (0 paramètre superflu)
+// ABI strictement aligné avec main.py
+// submit_score(card_name: str, card_power: u256)
+// get_player_stats(player_str: str)
+// get_pending_battle()
+// get_last_narrative(player_str: str)
+// get_verdict(player_str: str)
 const ABI = [
-  // writeContract
   "function challenge(string card_name, uint256 card_power) external",
   "function dispute_result(string reason) external",
   "function cancel_challenge() external",
-  // readContract
-  "function get_player_stats(string player_str) view returns (uint256 wins, uint256 losses, uint256 points, string last_result, string last_narrative, string verdict)",
-  "function get_pending_battle() view returns (string status, string challenger, string card, uint256 power)",
+  "function get_player_stats(string player_str) view returns (uint256, uint256, uint256, string, string, string)",
+  "function get_pending_battle() view returns (string, string, string, uint256)",
   "function get_last_narrative(string player_str) view returns (string)",
   "function get_verdict(string player_str) view returns (string)"
 ];
 
-// Met à jour le lien contrat dans la page
-document.getElementById('clink').textContent =
-  CONTRACT_ADDR.startsWith("0xREMPLACE")
-    ? "⚠ Adresse non configurée"
-    : CONTRACT_ADDR.slice(0,8)+'...'+CONTRACT_ADDR.slice(-6);
-document.getElementById('clink').href =
-  'https://explorer-studio.genlayer.com/contracts/'+CONTRACT_ADDR;
+// ═══════════════════════════════════════════════════════════════
+//  STATE
+// ═══════════════════════════════════════════════════════════════
+let wallet   = null;
+let provider = null;
+let signer   = null;
+let wc       = null;   // writeContract (avec signer)
+let iface    = null;   // Interface pour encoder les readContract
+let lb       = JSON.parse(localStorage.getItem('cbLB') || '[]');
 
-let wallet=null, provider=null, signer=null;
-let wc=null, iface=null;
-let lb = JSON.parse(localStorage.getItem('cbLB')||'[]');
-
-// ── Carte emojis ────────────────────────────────────────────
-const EM = {dragon:'🐉',phoenix:'🔥',titan:'⚡',zeus:'⚡',hydra:'🐍',
-            witch:'🧙',knight:'⚔️',demon:'😈',angel:'👼',wolf:'🐺',
-            kraken:'🦑',golem:'🪨',vampire:'🧛',wizard:'🔮',ghost:'👻'};
-function emoji(n){
-  const k=n.toLowerCase();
-  for(const[w,e] of Object.entries(EM)) if(k.includes(w)) return e;
+// ═══════════════════════════════════════════════════════════════
+//  CARD EMOJIS
+// ═══════════════════════════════════════════════════════════════
+const EM = {
+  dragon:'🐉', phoenix:'🔥', titan:'⚡', zeus:'⚡', hydra:'🐍',
+  witch:'🧙',  knight:'⚔️', demon:'😈', angel:'👼', wolf:'🐺',
+  kraken:'🦑', golem:'🪨',  vampire:'🧛', wizard:'🔮', ghost:'👻',
+  fire:'🔥',   ice:'❄️',    shadow:'👤', light:'✨', storm:'⛈️'
+};
+function getEmoji(n) {
+  if (!n) return '🃏';
+  const k = n.toLowerCase();
+  for (const [w, e] of Object.entries(EM)) if (k.includes(w)) return e;
   return '🃏';
 }
 
-// ── Wallet ──────────────────────────────────────────────────
-async function connectWallet(){
-  if(!window.ethereum){setSt('MetaMask / Rabby not detected!','rd');return;}
-  try{
-    await window.ethereum.request({method:'eth_requestAccounts'});
-    provider = new ethers.providers.Web3Provider(window.ethereum);
+// ═══════════════════════════════════════════════════════════════
+//  WALLET CONNECTION — FIX PRINCIPAL
+//  Problème: window.ethereum peut ne pas être disponible immédiatement
+//  Solution: vérification + délai + support multi-wallet
+// ═══════════════════════════════════════════════════════════════
+async function connectWallet() {
+  // Vérifier la disponibilité d'un provider EVM
+  if (!window.ethereum) {
+    setSt('No EVM wallet detected. Install MetaMask or Rabby.', 'rd');
+    log('ERROR: window.ethereum undefined');
+    // Ouvrir MetaMask si pas installé
+    window.open('https://metamask.io/download/', '_blank');
+    return;
+  }
+
+  const btn = document.getElementById('btnConnect');
+  btn.disabled = true;
+  btn.textContent = '⏳ Connecting...';
+  setSt('Requesting wallet access...', 'go', true);
+
+  try {
+    // Demande d'accès au wallet — déclenche le popup MetaMask/Rabby
+    const accounts = await window.ethereum.request({
+      method: 'eth_requestAccounts'
+    });
+
+    if (!accounts || accounts.length === 0) {
+      throw new Error('No accounts returned');
+    }
+
+    // Créer le provider ethers v5 depuis window.ethereum
+    provider = new ethers.providers.Web3Provider(window.ethereum, 'any');
     signer   = provider.getSigner();
     wallet   = await signer.getAddress();
 
-    document.getElementById('waddr').textContent =
-      wallet.slice(0,6)+'...'+wallet.slice(-4)+' ✓';
+    log('Wallet connected: ' + wallet);
 
+    // Vérifier le réseau
     const net = await provider.getNetwork();
-    if(net.chainId!==CHAIN_ID){
-      document.getElementById('nbadge').innerHTML =
-        '<span style="color:#f87171">⚠ Switch to GenLayer Studionet — ChainID: 61999 | RPC: https://studio.genlayer.com/api</span>';
-      setSt('Wrong network — add GenLayer Studionet in MetaMask','rd');
-    }else{
+    log('Network chainId: ' + net.chainId);
+
+    if (net.chainId !== CHAIN_ID) {
+      // Tenter de switcher automatiquement vers GenLayer Studionet
+      try {
+        await window.ethereum.request({
+          method: 'wallet_switchEthereumChain',
+          params: [{ chainId: '0x' + CHAIN_ID.toString(16) }]
+        });
+        log('Switched to GenLayer Studionet');
+      } catch (switchErr) {
+        // Si la chain n'existe pas, la proposer
+        if (switchErr.code === 4902) {
+          try {
+            await window.ethereum.request({
+              method: 'wallet_addEthereumChain',
+              params: [{
+                chainId: '0x' + CHAIN_ID.toString(16),
+                chainName: 'GenLayer Studionet',
+                nativeCurrency: { name: 'GEN', symbol: 'GEN', decimals: 18 },
+                rpcUrls: ['https://studio.genlayer.com/api'],
+                blockExplorerUrls: ['https://explorer-studio.genlayer.com']
+              }]
+            });
+            log('GenLayer Studionet added to wallet');
+          } catch (addErr) {
+            log('Could not add network: ' + addErr.message);
+            document.getElementById('nbadge').innerHTML =
+              '<span style="color:#f87171">⚠ Add GenLayer Studionet manually: ChainID 61999</span>';
+          }
+        } else {
+          log('Switch network error: ' + switchErr.message);
+        }
+      }
+
+      // Re-vérifier après tentative de switch
+      const net2 = await provider.getNetwork();
+      if (net2.chainId !== CHAIN_ID) {
+        document.getElementById('nbadge').innerHTML =
+          '<span style="color:#f87171">⚠ Wrong network — ChainID: 61999 | RPC: https://studio.genlayer.com/api</span>';
+        setSt('Wrong network — switch to GenLayer Studionet', 'rd');
+      } else {
+        document.getElementById('nbadge').innerHTML =
+          '<span style="color:var(--green)">✓ GenLayer Studionet</span>';
+      }
+    } else {
       document.getElementById('nbadge').innerHTML =
         '<span style="color:var(--green)">✓ GenLayer Studionet</span>';
     }
 
-    // writeContract — envoie des vraies TX Call vers l'intelligent contract
+    // Initialiser les contracts
+    // writeContract — signer pour envoyer des TX Call vers l'intelligent contract
     wc    = new ethers.Contract(CONTRACT_ADDR, ABI, signer);
+    // iface — pour encoder les readContract (gen_call)
     iface = new ethers.utils.Interface(ABI);
 
-    log('Wallet: '+wallet);
-    log('writeContract → '+CONTRACT_ADDR);
-    setSt('Connected! Choose your card and challenge.','go');
+    // Afficher l'adresse
+    document.getElementById('waddr').textContent =
+      wallet.slice(0, 6) + '...' + wallet.slice(-4) + ' ✓';
+
+    // Activer les boutons
+    document.getElementById('btnSync').disabled      = false;
+    document.getElementById('btnCheck').disabled     = false;
+    document.getElementById('btnChallenge').disabled = false;
+    document.getElementById('btnDispute').disabled   = false;
+    btn.textContent = '✓ Connected';
+
+    setSt('Wallet connected! Choose your card.', 'gn');
+    log('writeContract initialized → ' + CONTRACT_ADDR);
+
+    // Écouter les changements de compte
+    window.ethereum.on('accountsChanged', (accs) => {
+      if (!accs.length) {
+        disconnectWallet();
+      } else {
+        wallet = accs[0];
+        document.getElementById('waddr').textContent =
+          wallet.slice(0,6)+'...'+wallet.slice(-4)+' ✓';
+        log('Account changed: ' + wallet);
+        syncStats();
+      }
+    });
+
+    // Écouter les changements de réseau
+    window.ethereum.on('chainChanged', () => {
+      log('Network changed — reloading...');
+      window.location.reload();
+    });
+
+    // Sync initial
     await syncStats();
     await checkPending();
-  }catch(e){setSt('Connection refused','rd');log(String(e.message||e));}
+
+  } catch (e) {
+    const msg = e.message || String(e);
+    if (msg.includes('rejected') || msg.includes('denied') || e.code === 4001) {
+      setSt('Connection rejected by user', 'rd');
+      log('User rejected connection');
+    } else {
+      setSt('Connection error: ' + msg.slice(0, 60), 'rd');
+      log('Connect error: ' + msg);
+    }
+    btn.disabled = false;
+    btn.textContent = '⚔ Connect Wallet';
+  }
 }
 
-// ── readContract via gen_call GenLayer RPC ───────────────────
-async function readContract(fn, args){
-  if(!wallet||!iface) return null;
+function disconnectWallet() {
+  wallet = null; provider = null; signer = null; wc = null; iface = null;
+  document.getElementById('waddr').textContent = 'Not connected';
+  document.getElementById('nbadge').innerHTML  = '';
+  document.getElementById('btnConnect').textContent = '⚔ Connect Wallet';
+  document.getElementById('btnConnect').disabled    = false;
+  document.getElementById('btnSync').disabled       = true;
+  document.getElementById('btnCheck').disabled      = true;
+  document.getElementById('btnChallenge').disabled  = true;
+  document.getElementById('btnDispute').disabled    = true;
+  setSt('Disconnected', 'rd');
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  readContract — gen_call GenLayer RPC
+// ═══════════════════════════════════════════════════════════════
+async function readContract(fn, args) {
+  if (!wallet || !iface) {
+    log('readContract: not connected');
+    return null;
+  }
   const data = iface.encodeFunctionData(fn, args);
-  log('readContract: '+fn);
-  try{
-    const r = await fetch(GL_RPC,{
-      method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({jsonrpc:'2.0',method:'gen_call',
-        params:[{Type:'read',Data:data,from:wallet,to:CONTRACT_ADDR}],id:Date.now()})
+  log('readContract: ' + fn + '(' + JSON.stringify(args) + ')');
+  try {
+    const resp = await fetch(GL_RPC, {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        jsonrpc: '2.0',
+        method:  'gen_call',
+        params:  [{ Type: 'read', Data: data, from: wallet, to: CONTRACT_ADDR }],
+        id:      Date.now()
+      })
     });
-    const j = await r.json();
-    if(j.result?.status?.code===0 && j.result?.data){
-      const dec = iface.decodeFunctionResult(fn,'0x'+j.result.data);
-      log('readContract ✓: '+JSON.stringify(Array.from(dec)).slice(0,80));
-      return dec;
+    const json = await resp.json();
+    if (json.result && json.result.status && json.result.status.code === 0 && json.result.data) {
+      const decoded = iface.decodeFunctionResult(fn, '0x' + json.result.data);
+      log('readContract OK: ' + JSON.stringify(Array.from(decoded)).slice(0, 90));
+      return decoded;
     }
-    log('gen_call: '+JSON.stringify(j.error||j.result||'').slice(0,80));
-  }catch(e){log('readContract err: '+(e.message||'').slice(0,60));}
+    const errMsg = JSON.stringify(json.error || json.result || '').slice(0, 80);
+    log('readContract response: ' + errMsg);
+  } catch (e) {
+    log('readContract fetch error: ' + (e.message || '').slice(0, 60));
+  }
   return null;
 }
 
-async function syncStats(){
-  if(!wallet) return;
-  setSt('🔄 readContract: get_player_stats...','go');
-  const d = await readContract('get_player_stats',[wallet]);
-  if(d){
-    const n = v=>v?.toNumber?v.toNumber():parseInt(v||0);
-    document.getElementById('dw').textContent = n(d[0]);
-    document.getElementById('dl').textContent = n(d[1]);
-    document.getElementById('dp').textContent = n(d[2]);
-    document.getElementById('dc').textContent = n(d[2]);
-    const narr = d[4]||'';
-    if(narr && narr!=='No battles yet') showNarr(narr, d[3]==='WIN');
-    updateLB(n(d[2]));
-    setSt('✅ Stats synced from chain','gn');
-  }else{
-    setSt('Stats sync failed — check contract address','rd');
-  }
-}
-
-async function checkPending(){
-  if(!wallet) return;
-  const d = await readContract('get_pending_battle',[]);
-  if(!d) return;
-  const status = d[0]||'';
-  const pbox = document.getElementById('pbox');
-  if(status==='waiting_for_opponent'){
-    const ch   = d[1]||'';
-    const card = d[2]||'Unknown';
-    const pow  = d[3]?.toNumber?d[3].toNumber():parseInt(d[3]||0);
-    pbox.classList.add('show');
-    document.getElementById('pinfo').innerHTML =
-      `<strong style="color:var(--gold)">${card}</strong> (Power: ${pow}) — `+
-      `Challenger: ${ch.slice(0,8)}...`;
-    document.getElementById('oppname').textContent = card;
-    document.getElementById('oppstats').style.display='block';
-    document.getElementById('oppfill').style.width=(pow*10)+'%';
-    document.getElementById('opppnum').textContent=pow;
-    document.getElementById('oppcard').classList.add('gr');
-    if(ch.toLowerCase()===wallet.toLowerCase()){
-      document.getElementById('cancelbtn').style.display='block';
-    }
-  }else{
-    pbox.classList.remove('show');
-    document.getElementById('oppname').textContent='Waiting for challenger...';
-    document.getElementById('oppstats').style.display='none';
-    document.getElementById('oppcard').classList.remove('gr');
-    document.getElementById('cancelbtn').style.display='none';
-  }
-}
-
-// ── writeContract ────────────────────────────────────────────
-async function callWrite(fn, args, label){
-  if(!wc){setSt('Connect wallet first','rd');return null;}
-  if(CONTRACT_ADDR.startsWith("0xB3Dd317c35f4fC4069c639D37d3C4a3db6C39A6a")){
-    setSt('⚠ Set your contract address in index.html line 1!','rd');
-    log('ERROR: CONTRACT_ADDR not set');
+// ═══════════════════════════════════════════════════════════════
+//  writeContract — envoi TX réelle vers l'intelligent contract
+// ═══════════════════════════════════════════════════════════════
+async function callWrite(fn, args, label) {
+  if (!wc) {
+    setSt('Connect wallet first', 'rd');
     return null;
   }
-  try{
-    setSt('📤 writeContract.'+fn+'...','go',true);
-    log('writeContract.'+fn+'('+JSON.stringify(args)+')');
+  try {
+    setSt('📤 ' + label + '...', 'go', true);
+    log('writeContract.' + fn + '(' + JSON.stringify(args) + ')');
+
+    // Envoi la TX — crée un vrai Call vers l'intelligent contract GenLayer
     const tx = await wc[fn](...args);
-    log('TX: '+tx.hash);
-    log('→ https://explorer-studio.genlayer.com/transactions/'+tx.hash);
-    setSt('⏳ Consensus + LLM in progress...','go',true);
-    const ok = await waitFin(tx.hash);
-    setSt(ok?'✅ '+label+' FINALIZED!':'✅ TX sent — check explorer','gn');
-    log('✅ '+(ok?'FINALIZED':'sent')+': '+tx.hash);
+    log('TX hash: ' + tx.hash);
+    log('Explorer: https://explorer-studio.genlayer.com/transactions/' + tx.hash);
+
+    setSt('⏳ GenLayer consensus + LLM in progress...', 'go', true);
+
+    // Attendre FINALIZED via gen_getTransactionStatus
+    const ok = await waitFinalized(tx.hash);
+    if (ok) {
+      setSt('✅ ' + label + ' — FINALIZED!', 'gn');
+      log('✅ FINALIZED: ' + tx.hash);
+    } else {
+      setSt('✅ TX sent — check explorer for confirmation', 'gn');
+      log('TX sent (timeout waiting): ' + tx.hash);
+    }
     return tx.hash;
-  }catch(e){
-    setSt('⚠ TX sent — check explorer','rd');
-    log('writeContract err: '+(e.message||'').slice(0,100));
+
+  } catch (e) {
+    const msg = e.message || String(e);
+    if (msg.includes('rejected') || msg.includes('denied') || e.code === 4001) {
+      setSt('TX rejected by user', 'rd');
+      log('User rejected TX');
+    } else {
+      setSt('TX error — check explorer', 'rd');
+      log('writeContract error: ' + msg.slice(0, 100));
+    }
     console.error(e);
     return null;
   }
 }
 
-async function waitFin(h,max=22){
-  for(let i=0;i<max;i++){
-    await new Promise(r=>setTimeout(r,3000));
-    try{
-      const r=await fetch(GL_RPC,{method:'POST',
-        headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({jsonrpc:'2.0',method:'gen_getTransactionStatus',
-          params:[{txId:h}],id:Date.now()})});
-      const j=await r.json();
-      const s=j.result?.status||'';
-      log('Status: '+s+' ('+(i+1)+'/'+max+')');
-      if(s==='FINALIZED'||s==='ACCEPTED') return true;
-      if(s==='CANCELED'||s==='UNDETERMINED') return false;
-    }catch(e){}
+// Poll gen_getTransactionStatus jusqu'à FINALIZED ou ACCEPTED
+async function waitFinalized(txHash, maxTries = 25) {
+  for (let i = 0; i < maxTries; i++) {
+    await sleep(3000);
+    try {
+      const resp = await fetch(GL_RPC, {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          jsonrpc: '2.0',
+          method:  'gen_getTransactionStatus',
+          params:  [{ txId: txHash }],
+          id:      Date.now()
+        })
+      });
+      const json = await resp.json();
+      const s = json.result?.status || '';
+      log('Status [' + (i+1) + '/' + maxTries + ']: ' + s);
+      if (s === 'FINALIZED' || s === 'ACCEPTED') return true;
+      if (s === 'CANCELED' || s === 'UNDETERMINED') {
+        log('TX failed with status: ' + s);
+        return false;
+      }
+    } catch (e) {
+      log('Status poll error: ' + (e.message||'').slice(0,40));
+    }
   }
   return false;
 }
 
-// ── Actions ──────────────────────────────────────────────────
-async function doChallenge(){
-  if(!wallet){setSt('Connect wallet first','rd');return;}
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+
+// ═══════════════════════════════════════════════════════════════
+//  SYNC STATS — readContract get_player_stats
+// ═══════════════════════════════════════════════════════════════
+async function syncStats() {
+  if (!wallet) { setSt('Connect wallet first', 'rd'); return; }
+  setSt('🔄 Syncing on-chain stats...', 'go', true);
+  const d = await readContract('get_player_stats', [wallet]);
+  if (d) {
+    const n = v => v?.toNumber ? v.toNumber() : parseInt(v || 0);
+    document.getElementById('dw').textContent = n(d[0]);
+    document.getElementById('dl').textContent = n(d[1]);
+    document.getElementById('dp').textContent = n(d[2]);
+    document.getElementById('dc').textContent = n(d[2]);
+    const narr = d[4] || '';
+    if (narr && narr !== 'No battles yet') {
+      showNarrative(narr, d[3] === 'WIN');
+    }
+    updateLB(n(d[2]));
+    setSt('✅ Stats synced', 'gn');
+  } else {
+    document.getElementById('dc').textContent = '?';
+    setSt('Could not read chain — check contract address', 'rd');
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  CHECK PENDING BATTLE
+// ═══════════════════════════════════════════════════════════════
+async function checkPending() {
+  if (!wallet) return;
+  const d = await readContract('get_pending_battle', []);
+  if (!d) return;
+
+  const status = d[0] || '';
+  const pbox   = document.getElementById('pbox');
+
+  if (status === 'waiting_for_opponent') {
+    const ch   = d[1] || '';
+    const card = d[2] || 'Unknown';
+    const pow  = d[3]?.toNumber ? d[3].toNumber() : parseInt(d[3] || 0);
+
+    pbox.classList.add('show');
+    document.getElementById('pinfo').innerHTML =
+      `<strong style="color:var(--gold)">${card}</strong> (Power: ${pow}) — ` +
+      `Challenger: ${ch.slice(0, 8)}...${ch.slice(-4)}`;
+    document.getElementById('oppname').textContent = card;
+    document.getElementById('oppart').textContent  = getEmoji(card);
+    document.getElementById('oppstats').style.display = 'block';
+    document.getElementById('oppfill').style.width = (pow * 10) + '%';
+    document.getElementById('opppnum').textContent = pow;
+    document.getElementById('oppcard').classList.add('gr');
+    document.getElementById('oppinfo').style.display = 'none';
+
+    // Afficher cancel si c'est notre challenge
+    if (ch.toLowerCase() === wallet.toLowerCase()) {
+      document.getElementById('btnCancel').style.display = 'block';
+    }
+  } else {
+    pbox.classList.remove('show');
+    document.getElementById('oppname').textContent = 'Waiting...';
+    document.getElementById('oppart').textContent  = '⚔';
+    document.getElementById('oppstats').style.display = 'none';
+    document.getElementById('oppcard').classList.remove('gr');
+    document.getElementById('oppinfo').style.display = 'block';
+    document.getElementById('btnCancel').style.display = 'none';
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  ACTIONS
+// ═══════════════════════════════════════════════════════════════
+async function doChallenge() {
+  if (!wallet) { setSt('Connect wallet first', 'rd'); return; }
   const name = document.getElementById('cname').value.trim();
   const pow  = parseInt(document.getElementById('cpow').value);
-  if(!name){setSt('Enter a card name!','rd');return;}
-  const hash = await callWrite('challenge',[name,pow],'challenge('+name+')');
-  if(hash){
-    setTimeout(async()=>{
-      await syncStats();
-      await checkPending();
-      const r = await readContract('get_last_narrative',[wallet]);
-      if(r?.[0] && r[0]!=='No battles yet'){
-        const s = await readContract('get_player_stats',[wallet]);
-        showNarr(r[0], s?.[3]==='WIN');
-      }
-    },5000);
+  if (!name) { setSt('Enter a card name!', 'rd'); return; }
+  if (name.length < 2) { setSt('Card name too short', 'rd'); return; }
+
+  // Désactiver le bouton pendant la TX
+  const btn = document.getElementById('btnChallenge');
+  btn.disabled = true;
+  btn.textContent = '⏳ Sending...';
+
+  const hash = await callWrite('challenge', [name, pow], 'challenge(' + name + ')');
+
+  btn.disabled = false;
+  btn.textContent = '⚔ Challenge!';
+
+  if (hash) {
+    // Attendre puis sync
+    await sleep(5000);
+    await syncStats();
+    await checkPending();
+    // Lire la narrative si une bataille a eu lieu
+    const r = await readContract('get_last_narrative', [wallet]);
+    if (r?.[0] && r[0] !== 'No battles yet') {
+      const s = await readContract('get_player_stats', [wallet]);
+      showNarrative(r[0], s?.[3] === 'WIN');
+    }
   }
 }
 
-async function doCancel(){
-  const hash = await callWrite('cancel_challenge',[],'cancel_challenge');
-  if(hash){
+async function doCancel() {
+  const btn = document.getElementById('btnCancel');
+  btn.disabled = true;
+  const hash = await callWrite('cancel_challenge', [], 'cancel_challenge');
+  btn.disabled = false;
+  if (hash) {
     document.getElementById('pbox').classList.remove('show');
-    document.getElementById('cancelbtn').style.display='none';
-    setTimeout(checkPending,3000);
+    document.getElementById('btnCancel').style.display = 'none';
+    await sleep(3000);
+    await checkPending();
   }
 }
 
-function toggleDispute(){
-  document.getElementById('dpanel').classList.toggle('show');
+function toggleDispute() {
+  document.getElementById('dpan').classList.toggle('show');
 }
 
-async function doDispute(){
-  if(!wallet){setSt('Connect wallet first','rd');return;}
-  const r = document.getElementById('dreason').value.trim();
-  if(!r){setSt('Enter your dispute reason','rd');return;}
-  const hash = await callWrite('dispute_result',[r],'dispute_result');
-  if(hash){
-    setTimeout(async()=>{
-      const v = await readContract('get_verdict',[wallet]);
-      if(v?.[0]){
-        const valid = v[0].toUpperCase().includes('VALID');
-        document.getElementById('dverdict').innerHTML =
-          `<span style="color:${valid?'var(--green)':'var(--red)'}">
-            ${valid?'✅ VALID':'❌ INVALID'}: ${v[0]}
-          </span>`;
-      }
-    },5000);
+async function doDispute() {
+  if (!wallet) { setSt('Connect wallet first', 'rd'); return; }
+  const reason = document.getElementById('dreason').value.trim();
+  if (!reason) { setSt('Enter your dispute reason', 'rd'); return; }
+
+  const hash = await callWrite('dispute_result', [reason], 'dispute_result');
+  if (hash) {
+    await sleep(5000);
+    const v = await readContract('get_verdict', [wallet]);
+    if (v?.[0]) {
+      const valid = v[0].toUpperCase().includes('VALID');
+      document.getElementById('dverdict').innerHTML =
+        `<span style="color:${valid ? 'var(--green)' : 'var(--red)'}">
+          ${valid ? '✅ VALID' : '❌ INVALID'}: ${v[0]}
+        </span>`;
+      if (valid) await syncStats();
+    }
   }
 }
 
-// ── UI helpers ────────────────────────────────────────────────
-function updateCard(){
-  const n = document.getElementById('cname').value||'Your Card';
-  document.getElementById('myname').textContent=n;
-  document.getElementById('myart').textContent=emoji(n);
+// ═══════════════════════════════════════════════════════════════
+//  UI HELPERS
+// ═══════════════════════════════════════════════════════════════
+function updateCard() {
+  const n = document.getElementById('cname').value || 'Your Card';
+  document.getElementById('myname').textContent = n;
+  document.getElementById('myart').textContent  = getEmoji(n);
   const c = document.getElementById('mycard');
-  c.classList.remove('gg','gr','gn');
-  if(n.length>2) c.classList.add('gg');
+  c.classList.remove('gg', 'gr');
+  if (n.length > 1) c.classList.add('gg');
 }
-function updatePow(){
+
+function updatePow() {
   const p = document.getElementById('cpow').value;
-  document.getElementById('mypnum').textContent=p;
-  document.getElementById('myfill').style.width=(p*10)+'%';
+  document.getElementById('mypnum').textContent = p;
+  document.getElementById('myfill').style.width = (p * 10) + '%';
 }
-function showNarr(text, isWin){
+
+function showNarrative(text, isWin) {
   const box = document.getElementById('narrbox');
-  document.getElementById('narrtext').textContent=text;
-  document.getElementById('narrbadge').innerHTML = isWin
-    ? '<span class="badge bwin">🏆 VICTORY</span>'
-    : '<span class="badge bloss">💀 DEFEAT</span>';
+  document.getElementById('ntxt').textContent = text;
+  document.getElementById('nbadge2').innerHTML = isWin
+    ? '<span class="badge bw">🏆 VICTORY</span>'
+    : '<span class="badge bl">💀 DEFEAT</span>';
   box.classList.add('show');
-  log('🤖 LLM narrative: '+text.slice(0,60)+'...');
+  log('🤖 LLM narrative: ' + text.slice(0, 70) + '...');
 }
-function setSt(m,t='',pulse=false){
-  document.getElementById('smsg').textContent=m;
-  const d=document.getElementById('sdot');
-  d.className='sdot';
-  if(t) d.classList.add(t);
-  if(pulse) d.classList.add('pulse');
+
+function setSt(msg, type = '', pulse = false) {
+  document.getElementById('smsg').textContent = msg;
+  const d = document.getElementById('sdot');
+  d.className = 'dot';
+  if (type) d.classList.add(type);
+  if (pulse) d.classList.add('pulse');
 }
-function log(m){
-  const el=document.getElementById('txlog');
-  el.textContent+='\n'+new Date().toLocaleTimeString()+' › '+m;
-  el.scrollTop=el.scrollHeight;
+
+function log(m) {
+  const el = document.getElementById('txl');
+  el.textContent += '\n' + new Date().toLocaleTimeString() + ' › ' + m;
+  el.scrollTop = el.scrollHeight;
 }
-function updateLB(pts){
-  const a=wallet?wallet.slice(0,6)+'...'+wallet.slice(-4):'Player';
-  const e=lb.find(x=>x.a===a);
-  if(!e)lb.push({a,p:pts});else if(pts>e.p)e.p=pts;
-  lb.sort((a,b)=>b.p-a.p);lb=lb.slice(0,5);
-  localStorage.setItem('cbLB',JSON.stringify(lb));renderLB();
+
+function updateLB(pts) {
+  if (!wallet) return;
+  const a = wallet.slice(0, 6) + '...' + wallet.slice(-4);
+  const e = lb.find(x => x.a === a);
+  if (!e) lb.push({ a, p: pts });
+  else if (pts > e.p) e.p = pts;
+  lb.sort((a, b) => b.p - a.p);
+  lb = lb.slice(0, 5);
+  localStorage.setItem('cbLB', JSON.stringify(lb));
+  renderLB();
 }
-function renderLB(){
-  const el=document.getElementById('lb');
-  if(!lb.length){
-    el.innerHTML='<div style="font-size:12px;color:var(--muted);text-align:center;font-style:italic">No battles yet</div>';
+
+function renderLB() {
+  const el = document.getElementById('lb');
+  if (!lb.length) {
+    el.innerHTML = '<div style="font-size:12px;color:var(--muted);text-align:center;font-style:italic">No battles yet — be the first champion</div>';
     return;
   }
-  const m=['🥇','🥈','🥉','4.','5.'];
-  el.innerHTML=lb.map((e,i)=>
-    `<div class="lbrow">
-      <span class="lbrank">${m[i]}</span>
-      <span class="lbaddr">${e.a}</span>
-      <span class="lbpts">${e.p} pts</span>
-    </div>`).join('');
+  const medals = ['🥇','🥈','🥉','4.','5.'];
+  el.innerHTML = lb.map((e, i) =>
+    `<div class="lbr">
+      <span class="lbrk">${medals[i]}</span>
+      <span class="lba">${e.a}</span>
+      <span class="lbp">${e.p} pts</span>
+    </div>`
+  ).join('');
 }
-renderLB();updatePow();
+
+// ═══════════════════════════════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════════════════════════════
+renderLB();
+updatePow();
+
+// Auto-reconnect si déjà connecté (sans popup)
+window.addEventListener('load', async () => {
+  if (window.ethereum) {
+    try {
+      const accounts = await window.ethereum.request({ method: 'eth_accounts' });
+      if (accounts && accounts.length > 0) {
+        log('Auto-reconnecting to: ' + accounts[0]);
+        await connectWallet();
+      }
+    } catch (e) {
+      // silent fail — normal si pas encore connecté
+    }
+  }
+});
 </script>
 </body>
 </html>
